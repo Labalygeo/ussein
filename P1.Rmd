@@ -1,0 +1,64 @@
+---
+title: "Manuel Carto sur R"
+output: html_document
+date: "2023-03-10"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Etape 1: Import des librairies. 
+Il sagit de quatre librairies qui seront indispensables à l'execution des taches dans ce manuel. Si le chargement de la librairie n'est pas encore fait , vous pouvez cliquer sur packkage et dans la barre de recherche, selectionner le package que vous souhaiter installer. vous devez repeter cette opération pour tous vos packages.
+
+```{r}
+library(mapsf)
+library(sf)
+library(mapview)
+library(leafsync)
+```
+
+## Etape 2: Création et affichage des données shapefiles
+
+Nous allons utiliser  des données vectorielles(régions, départements,localités et communes) au  format shapefile que nous avons bien copiées dans le dossier data qui se trouve dans le même emplacement que le projet. 
+
+```{r}
+reg <-st_read("data/Senegal/lim_reg.shp", quiet = TRUE)
+
+com <- st_read("data/Senegal/communes.shp", quiet = TRUE)
+
+dep <-st_read("data/Senegal/dep.shp", quiet = TRUE)
+
+loc <-st_read("data/Senegal/loc.shp", quiet = TRUE)
+```
+
+## Partie 3: Affichage des données avec la librairie mapview. Nous avons construit deux cartes cote à cote. Pour chaque carte, nous avons choisi une colonne. Chaque carte doit avoir son nom. A la fin , on doit préciser via la fonction sync les noms des deux cartes interactives.
+
+```{r}
+Carte1 <- mapview(reg, zcol='NOM', 
+        layer.name = 'Region',
+        stroke=FALSE, 
+        legend= FALSE
+) 
+  
+Carte2 <- mapview(reg, zcol='pop', 
+          layer.name = 'Population', 
+          homebutton=FALSE, 
+          legend=TRUE,
+          col.regions = RColorBrewer::brewer.pal(5, "RdYlGn"), alpha.regions = 1
+)
+
+library(leafsync)
+sync(Carte1, Carte2)
+
+mapView(com, zcol= 'CCRCA',
+          homebutton = FALSE,
+          legend = FALSE) +
+  
+mapview(dep, zcol= 'NOM', 
+         layer.name = 'Departement',
+         homebutton = FALSE,
+         legend = FALSE)+
+mapview(loc, 
+         legend = FALSE)
+```
